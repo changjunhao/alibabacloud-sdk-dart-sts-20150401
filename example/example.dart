@@ -5,7 +5,7 @@ void main() async {
   const accessKeyId = 'your-access-key-id';
   const accessKeySecret = 'your-access-key-secret';
   const roleArn = 'acs:ram::123456789012****:role/adminrole';
-  
+
   // Create STS client
   final client = StsClient(
     accessKeyId: accessKeyId,
@@ -17,10 +17,10 @@ void main() async {
 
   // Example 1: Get caller identity
   await getCallerIdentityExample(client);
-  
+
   // Example 2: Assume role
   await assumeRoleExample(client, roleArn);
-  
+
   // Example 3: Assume role with policy
   await assumeRoleWithPolicyExample(client, roleArn);
 }
@@ -28,10 +28,10 @@ void main() async {
 /// Example: Get caller identity
 Future<void> getCallerIdentityExample(StsClient client) async {
   print('1. Getting caller identity...');
-  
+
   try {
     final response = await client.getCallerIdentity();
-    
+
     print('✓ Success!');
     print('  Account ID: ${response.accountId}');
     print('  User ID: ${response.userId}');
@@ -42,55 +42,58 @@ Future<void> getCallerIdentityExample(StsClient client) async {
   } catch (e) {
     print('✗ Error: $e');
   }
-  
+
   print('');
 }
 
 /// Example: Assume role
 Future<void> assumeRoleExample(StsClient client, String roleArn) async {
   print('2. Assuming role...');
-  
+
   final request = AssumeRoleRequest(
     roleArn: roleArn,
     roleSessionName: 'dart-sdk-example-session',
     durationSeconds: 3600, // 1 hour
     externalId: 'external-id-example',
   );
-  
+
   try {
     final response = await client.assumeRole(request);
-    
+
     print('✓ Success!');
     print('  Request ID: ${response.requestId}');
-    
+
     if (response.credentials != null) {
       print('  Temporary Credentials:');
       print('    AccessKeyId: ${response.credentials!.accessKeyId}');
-      print('    AccessKeySecret: ${response.credentials!.accessKeySecret?.substring(0, 8)}...');
-      print('    SecurityToken: ${response.credentials!.securityToken?.substring(0, 20)}...');
+      print(
+          '    AccessKeySecret: ${response.credentials!.accessKeySecret?.substring(0, 8)}...');
+      print(
+          '    SecurityToken: ${response.credentials!.securityToken?.substring(0, 20)}...');
       print('    Expiration: ${response.credentials!.expiration}');
     }
-    
+
     if (response.assumedRoleUser != null) {
       print('  Assumed Role User:');
       print('    ARN: ${response.assumedRoleUser!.arn}');
       print('    AssumedRoleId: ${response.assumedRoleUser!.assumedRoleId}');
     }
-    
+
     if (response.sourceIdentity != null) {
       print('  Source Identity: ${response.sourceIdentity}');
     }
   } catch (e) {
     print('✗ Error: $e');
   }
-  
+
   print('');
 }
 
 /// Example: Assume role with custom policy
-Future<void> assumeRoleWithPolicyExample(StsClient client, String roleArn) async {
+Future<void> assumeRoleWithPolicyExample(
+    StsClient client, String roleArn) async {
   print('3. Assuming role with custom policy...');
-  
+
   // Custom policy that only allows reading from a specific OSS bucket
   const customPolicy = '''{
   "Version": "1",
@@ -108,21 +111,22 @@ Future<void> assumeRoleWithPolicyExample(StsClient client, String roleArn) async
     }
   ]
 }''';
-  
+
   final request = AssumeRoleRequest(
     roleArn: roleArn,
     roleSessionName: 'dart-sdk-limited-session',
     durationSeconds: 1800, // 30 minutes
     policy: customPolicy,
   );
-  
+
   try {
     final response = await client.assumeRole(request);
-    
+
     print('✓ Success!');
     print('  Request ID: ${response.requestId}');
-    print('  Applied custom policy to limit permissions to OSS bucket access only');
-    
+    print(
+        '  Applied custom policy to limit permissions to OSS bucket access only');
+
     if (response.credentials != null) {
       print('  Limited Credentials:');
       print('    AccessKeyId: ${response.credentials!.accessKeyId}');
@@ -131,7 +135,7 @@ Future<void> assumeRoleWithPolicyExample(StsClient client, String roleArn) async
   } catch (e) {
     print('✗ Error: $e');
   }
-  
+
   print('');
 }
 

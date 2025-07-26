@@ -112,7 +112,8 @@ class StsClient {
       String action, Map<String, String> parameters) async {
     final endpoint = _getEndpoint();
     final now = DateTime.now().toUtc();
-    final timestamp = '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}T${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}Z';
+    final timestamp =
+        '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}T${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}Z';
     final nonce = DateTime.now().millisecondsSinceEpoch.toString();
 
     // Common parameters
