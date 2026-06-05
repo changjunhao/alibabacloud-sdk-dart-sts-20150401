@@ -20,9 +20,9 @@
 /// );
 ///
 /// final response = await client.assumeRole(request);
-/// print('AccessKeyId: ${response.credentials?.accessKeyId}');
+/// print('AccessKeyId: ${response.body?.credentials?.accessKeyId}');
 /// ```
 library alibabacloud_sts20150401;
 
-export 'src/client.dart';
+export 'src/client.dart' show StsClient, StsException;
 export 'src/models.dart';

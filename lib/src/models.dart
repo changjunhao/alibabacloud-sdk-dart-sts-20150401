@@ -39,8 +39,8 @@ class AssumeRoleRequest {
   }
 }
 
-/// Response model for AssumeRole API
-class AssumeRoleResponse {
+/// Response body model for AssumeRole API
+class AssumeRoleResponseBody {
   /// The assumed role user information.
   final AssumedRoleUser? assumedRoleUser;
 
@@ -53,15 +53,15 @@ class AssumeRoleResponse {
   /// The source identity.
   final String? sourceIdentity;
 
-  AssumeRoleResponse({
+  AssumeRoleResponseBody({
     this.assumedRoleUser,
     this.credentials,
     this.requestId,
     this.sourceIdentity,
   });
 
-  factory AssumeRoleResponse.fromJson(Map<String, dynamic> json) {
-    return AssumeRoleResponse(
+  factory AssumeRoleResponseBody.fromJson(Map<String, dynamic> json) {
+    return AssumeRoleResponseBody(
       assumedRoleUser: json['AssumedRoleUser'] != null
           ? AssumedRoleUser.fromJson(json['AssumedRoleUser'])
           : null,
@@ -71,6 +71,53 @@ class AssumeRoleResponse {
       requestId: json['RequestId'],
       sourceIdentity: json['SourceIdentity'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (assumedRoleUser != null) map['AssumedRoleUser'] = assumedRoleUser!.toJson();
+    if (credentials != null) map['Credentials'] = credentials!.toJson();
+    if (requestId != null) map['RequestId'] = requestId;
+    if (sourceIdentity != null) map['SourceIdentity'] = sourceIdentity;
+    return map;
+  }
+}
+
+/// Response model for AssumeRole API
+class AssumeRoleResponse {
+  /// The response headers.
+  final Map<String, String>? headers;
+
+  /// The HTTP status code.
+  final int? statusCode;
+
+  /// The response body.
+  final AssumeRoleResponseBody? body;
+
+  AssumeRoleResponse({
+    this.headers,
+    this.statusCode,
+    this.body,
+  });
+
+  factory AssumeRoleResponse.fromJson(Map<String, dynamic> json) {
+    return AssumeRoleResponse(
+      headers: json['headers'] != null
+          ? Map<String, String>.from(json['headers'])
+          : null,
+      statusCode: json['statusCode'],
+      body: json['body'] != null
+          ? AssumeRoleResponseBody.fromJson(json['body'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (headers != null) map['headers'] = headers;
+    if (statusCode != null) map['statusCode'] = statusCode;
+    if (body != null) map['body'] = body!.toJson();
+    return map;
   }
 }
 
@@ -115,8 +162,8 @@ class AssumeRoleWithOIDCRequest {
   }
 }
 
-/// Response model for AssumeRoleWithOIDC API
-class AssumeRoleWithOIDCResponse {
+/// Response body model for AssumeRoleWithOIDC API
+class AssumeRoleWithOIDCResponseBody {
   /// The assumed role user information.
   final AssumedRoleUser? assumedRoleUser;
 
@@ -132,7 +179,7 @@ class AssumeRoleWithOIDCResponse {
   /// The source identity.
   final String? sourceIdentity;
 
-  AssumeRoleWithOIDCResponse({
+  AssumeRoleWithOIDCResponseBody({
     this.assumedRoleUser,
     this.credentials,
     this.oidcTokenInfo,
@@ -140,8 +187,8 @@ class AssumeRoleWithOIDCResponse {
     this.sourceIdentity,
   });
 
-  factory AssumeRoleWithOIDCResponse.fromJson(Map<String, dynamic> json) {
-    return AssumeRoleWithOIDCResponse(
+  factory AssumeRoleWithOIDCResponseBody.fromJson(Map<String, dynamic> json) {
+    return AssumeRoleWithOIDCResponseBody(
       assumedRoleUser: json['AssumedRoleUser'] != null
           ? AssumedRoleUser.fromJson(json['AssumedRoleUser'])
           : null,
@@ -154,6 +201,54 @@ class AssumeRoleWithOIDCResponse {
       requestId: json['RequestId'],
       sourceIdentity: json['SourceIdentity'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (assumedRoleUser != null) map['AssumedRoleUser'] = assumedRoleUser!.toJson();
+    if (credentials != null) map['Credentials'] = credentials!.toJson();
+    if (oidcTokenInfo != null) map['OIDCTokenInfo'] = oidcTokenInfo!.toJson();
+    if (requestId != null) map['RequestId'] = requestId;
+    if (sourceIdentity != null) map['SourceIdentity'] = sourceIdentity;
+    return map;
+  }
+}
+
+/// Response model for AssumeRoleWithOIDC API
+class AssumeRoleWithOIDCResponse {
+  /// The response headers.
+  final Map<String, String>? headers;
+
+  /// The HTTP status code.
+  final int? statusCode;
+
+  /// The response body.
+  final AssumeRoleWithOIDCResponseBody? body;
+
+  AssumeRoleWithOIDCResponse({
+    this.headers,
+    this.statusCode,
+    this.body,
+  });
+
+  factory AssumeRoleWithOIDCResponse.fromJson(Map<String, dynamic> json) {
+    return AssumeRoleWithOIDCResponse(
+      headers: json['headers'] != null
+          ? Map<String, String>.from(json['headers'])
+          : null,
+      statusCode: json['statusCode'],
+      body: json['body'] != null
+          ? AssumeRoleWithOIDCResponseBody.fromJson(json['body'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (headers != null) map['headers'] = headers;
+    if (statusCode != null) map['statusCode'] = statusCode;
+    if (body != null) map['body'] = body!.toJson();
+    return map;
   }
 }
 
@@ -193,8 +288,8 @@ class AssumeRoleWithSAMLRequest {
   }
 }
 
-/// Response model for AssumeRoleWithSAML API
-class AssumeRoleWithSAMLResponse {
+/// Response body model for AssumeRoleWithSAML API
+class AssumeRoleWithSAMLResponseBody {
   /// The assumed role user information.
   final AssumedRoleUser? assumedRoleUser;
 
@@ -210,7 +305,7 @@ class AssumeRoleWithSAMLResponse {
   /// The source identity.
   final String? sourceIdentity;
 
-  AssumeRoleWithSAMLResponse({
+  AssumeRoleWithSAMLResponseBody({
     this.assumedRoleUser,
     this.credentials,
     this.requestId,
@@ -218,8 +313,8 @@ class AssumeRoleWithSAMLResponse {
     this.sourceIdentity,
   });
 
-  factory AssumeRoleWithSAMLResponse.fromJson(Map<String, dynamic> json) {
-    return AssumeRoleWithSAMLResponse(
+  factory AssumeRoleWithSAMLResponseBody.fromJson(Map<String, dynamic> json) {
+    return AssumeRoleWithSAMLResponseBody(
       assumedRoleUser: json['AssumedRoleUser'] != null
           ? AssumedRoleUser.fromJson(json['AssumedRoleUser'])
           : null,
@@ -233,10 +328,58 @@ class AssumeRoleWithSAMLResponse {
       sourceIdentity: json['SourceIdentity'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (assumedRoleUser != null) map['AssumedRoleUser'] = assumedRoleUser!.toJson();
+    if (credentials != null) map['Credentials'] = credentials!.toJson();
+    if (requestId != null) map['RequestId'] = requestId;
+    if (samlAssertionInfo != null) map['SAMLAssertionInfo'] = samlAssertionInfo!.toJson();
+    if (sourceIdentity != null) map['SourceIdentity'] = sourceIdentity;
+    return map;
+  }
 }
 
-/// Response model for GetCallerIdentity API
-class GetCallerIdentityResponse {
+/// Response model for AssumeRoleWithSAML API
+class AssumeRoleWithSAMLResponse {
+  /// The response headers.
+  final Map<String, String>? headers;
+
+  /// The HTTP status code.
+  final int? statusCode;
+
+  /// The response body.
+  final AssumeRoleWithSAMLResponseBody? body;
+
+  AssumeRoleWithSAMLResponse({
+    this.headers,
+    this.statusCode,
+    this.body,
+  });
+
+  factory AssumeRoleWithSAMLResponse.fromJson(Map<String, dynamic> json) {
+    return AssumeRoleWithSAMLResponse(
+      headers: json['headers'] != null
+          ? Map<String, String>.from(json['headers'])
+          : null,
+      statusCode: json['statusCode'],
+      body: json['body'] != null
+          ? AssumeRoleWithSAMLResponseBody.fromJson(json['body'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (headers != null) map['headers'] = headers;
+    if (statusCode != null) map['statusCode'] = statusCode;
+    if (body != null) map['body'] = body!.toJson();
+    return map;
+  }
+}
+
+/// Response body model for GetCallerIdentity API
+class GetCallerIdentityResponseBody {
   /// The Alibaba Cloud account ID.
   final String? accountId;
 
@@ -258,7 +401,7 @@ class GetCallerIdentityResponse {
   /// The ID of the RAM user.
   final String? userId;
 
-  GetCallerIdentityResponse({
+  GetCallerIdentityResponseBody({
     this.accountId,
     this.arn,
     this.identityType,
@@ -268,8 +411,8 @@ class GetCallerIdentityResponse {
     this.userId,
   });
 
-  factory GetCallerIdentityResponse.fromJson(Map<String, dynamic> json) {
-    return GetCallerIdentityResponse(
+  factory GetCallerIdentityResponseBody.fromJson(Map<String, dynamic> json) {
+    return GetCallerIdentityResponseBody(
       accountId: json['AccountId'],
       arn: json['Arn'],
       identityType: json['IdentityType'],
@@ -278,6 +421,56 @@ class GetCallerIdentityResponse {
       roleId: json['RoleId'],
       userId: json['UserId'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (accountId != null) map['AccountId'] = accountId;
+    if (arn != null) map['Arn'] = arn;
+    if (identityType != null) map['IdentityType'] = identityType;
+    if (principalId != null) map['PrincipalId'] = principalId;
+    if (requestId != null) map['RequestId'] = requestId;
+    if (roleId != null) map['RoleId'] = roleId;
+    if (userId != null) map['UserId'] = userId;
+    return map;
+  }
+}
+
+/// Response model for GetCallerIdentity API
+class GetCallerIdentityResponse {
+  /// The response headers.
+  final Map<String, String>? headers;
+
+  /// The HTTP status code.
+  final int? statusCode;
+
+  /// The response body.
+  final GetCallerIdentityResponseBody? body;
+
+  GetCallerIdentityResponse({
+    this.headers,
+    this.statusCode,
+    this.body,
+  });
+
+  factory GetCallerIdentityResponse.fromJson(Map<String, dynamic> json) {
+    return GetCallerIdentityResponse(
+      headers: json['headers'] != null
+          ? Map<String, String>.from(json['headers'])
+          : null,
+      statusCode: json['statusCode'],
+      body: json['body'] != null
+          ? GetCallerIdentityResponseBody.fromJson(json['body'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    if (headers != null) map['headers'] = headers;
+    if (statusCode != null) map['statusCode'] = statusCode;
+    if (body != null) map['body'] = body!.toJson();
+    return map;
   }
 }
 
@@ -302,10 +495,10 @@ class AssumedRoleUser {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'Arn': arn,
-      'AssumedRoleId': assumedRoleId,
-    };
+    final map = <String, dynamic>{};
+    if (arn != null) map['Arn'] = arn;
+    if (assumedRoleId != null) map['AssumedRoleId'] = assumedRoleId;
+    return map;
   }
 }
 
@@ -340,12 +533,12 @@ class Credentials {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'AccessKeyId': accessKeyId,
-      'AccessKeySecret': accessKeySecret,
-      'Expiration': expiration,
-      'SecurityToken': securityToken,
-    };
+    final map = <String, dynamic>{};
+    if (accessKeyId != null) map['AccessKeyId'] = accessKeyId;
+    if (accessKeySecret != null) map['AccessKeySecret'] = accessKeySecret;
+    if (expiration != null) map['Expiration'] = expiration;
+    if (securityToken != null) map['SecurityToken'] = securityToken;
+    return map;
   }
 }
 
@@ -390,14 +583,14 @@ class OIDCTokenInfo {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'ClientIds': clientIds,
-      'ExpirationTime': expirationTime,
-      'IssuanceTime': issuanceTime,
-      'Issuer': issuer,
-      'Subject': subject,
-      'VerificationInfo': verificationInfo,
-    };
+    final map = <String, dynamic>{};
+    if (clientIds != null) map['ClientIds'] = clientIds;
+    if (expirationTime != null) map['ExpirationTime'] = expirationTime;
+    if (issuanceTime != null) map['IssuanceTime'] = issuanceTime;
+    if (issuer != null) map['Issuer'] = issuer;
+    if (subject != null) map['Subject'] = subject;
+    if (verificationInfo != null) map['VerificationInfo'] = verificationInfo;
+    return map;
   }
 }
 
@@ -432,11 +625,61 @@ class SAMLAssertionInfo {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'Issuer': issuer,
-      'Recipient': recipient,
-      'Subject': subject,
-      'SubjectType': subjectType,
-    };
+    final map = <String, dynamic>{};
+    if (issuer != null) map['Issuer'] = issuer;
+    if (recipient != null) map['Recipient'] = recipient;
+    if (subject != null) map['Subject'] = subject;
+    if (subjectType != null) map['SubjectType'] = subjectType;
+    return map;
   }
+}
+
+/// Runtime options for API requests, similar to Swift SDK's TeaUtils.RuntimeOptions
+class RuntimeOptions {
+  /// Whether to auto-retry on failure
+  final bool? autoretry;
+
+  /// Maximum number of retry attempts
+  final int? maxAttempts;
+
+  /// Backoff policy: 'no', 'equal', 'exponential'
+  final String? backoffPolicy;
+
+  /// Backoff period in milliseconds
+  final int? backoffPeriod;
+
+  /// Read timeout in milliseconds
+  final int? readTimeout;
+
+  /// Connect timeout in milliseconds
+  final int? connectTimeout;
+
+  /// HTTP proxy URL
+  final String? httpProxy;
+
+  /// HTTPS proxy URL
+  final String? httpsProxy;
+
+  /// Hosts that should bypass proxy (comma-separated)
+  final String? noProxy;
+
+  /// SOCKS5 proxy URL
+  final String? socks5Proxy;
+
+  /// SOCKS5 network type
+  final String? socks5NetWork;
+
+  const RuntimeOptions({
+    this.autoretry,
+    this.maxAttempts,
+    this.backoffPolicy,
+    this.backoffPeriod,
+    this.readTimeout,
+    this.connectTimeout,
+    this.httpProxy,
+    this.httpsProxy,
+    this.noProxy,
+    this.socks5Proxy,
+    this.socks5NetWork,
+  });
 }

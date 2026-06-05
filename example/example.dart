@@ -1,16 +1,32 @@
+// ignore_for_file: avoid_print
+import 'dart:io';
+
 import 'package:alibabacloud_sts20150401/alibabacloud_sts20150401.dart';
 
 void main() async {
-  // Replace with your actual credentials
-  const accessKeyId = 'your-access-key-id';
-  const accessKeySecret = 'your-access-key-secret';
-  const roleArn = 'acs:ram::123456789012****:role/adminrole';
+  // Read credentials from environment variables
+  final accessKeyId = Platform.environment['ALIYUN_ACCESS_KEY_ID'];
+  final accessKeySecret = Platform.environment['ALIYUN_ACCESS_KEY_SECRET'];
+  final roleArn = Platform.environment['ALIYUN_STS_ROLE_ARN'];
+
+  if (accessKeyId == null || accessKeyId.isEmpty) {
+    print('Error: Environment variable ALIYUN_ACCESS_KEY_ID is not set.');
+    exit(1);
+  }
+  if (accessKeySecret == null || accessKeySecret.isEmpty) {
+    print('Error: Environment variable ALIYUN_ACCESS_KEY_SECRET is not set.');
+    exit(1);
+  }
+  if (roleArn == null || roleArn.isEmpty) {
+    print('Error: Environment variable ALIYUN_STS_ROLE_ARN is not set.');
+    exit(1);
+  }
 
   // Create STS client
   final client = StsClient(
     accessKeyId: accessKeyId,
     accessKeySecret: accessKeySecret,
-    regionId: 'cn-hangzhou',
+    regionId: 'cn-beijing',
   );
 
   print('=== Alibaba Cloud STS SDK for Dart Example ===\n');
@@ -33,12 +49,13 @@ Future<void> getCallerIdentityExample(StsClient client) async {
     final response = await client.getCallerIdentity();
 
     print('✓ Success!');
-    print('  Account ID: ${response.accountId}');
-    print('  User ID: ${response.userId}');
-    print('  ARN: ${response.arn}');
-    print('  Identity Type: ${response.identityType}');
-    print('  Principal ID: ${response.principalId}');
-    print('  Request ID: ${response.requestId}');
+    print('  Status Code: ${response.statusCode}');
+    print('  Account ID: ${response.body?.accountId}');
+    print('  User ID: ${response.body?.userId}');
+    print('  ARN: ${response.body?.arn}');
+    print('  Identity Type: ${response.body?.identityType}');
+    print('  Principal ID: ${response.body?.principalId}');
+    print('  Request ID: ${response.body?.requestId}');
   } catch (e) {
     print('✗ Error: $e');
   }
@@ -61,26 +78,27 @@ Future<void> assumeRoleExample(StsClient client, String roleArn) async {
     final response = await client.assumeRole(request);
 
     print('✓ Success!');
-    print('  Request ID: ${response.requestId}');
+    print('  Status Code: ${response.statusCode}');
+    print('  Request ID: ${response.body?.requestId}');
 
-    if (response.credentials != null) {
+    if (response.body?.credentials != null) {
       print('  Temporary Credentials:');
-      print('    AccessKeyId: ${response.credentials!.accessKeyId}');
+      print('    AccessKeyId: ${response.body!.credentials!.accessKeyId}');
       print(
-          '    AccessKeySecret: ${response.credentials!.accessKeySecret?.substring(0, 8)}...');
+          '    AccessKeySecret: ${response.body!.credentials!.accessKeySecret?.substring(0, 8)}...');
       print(
-          '    SecurityToken: ${response.credentials!.securityToken?.substring(0, 20)}...');
-      print('    Expiration: ${response.credentials!.expiration}');
+          '    SecurityToken: ${response.body!.credentials!.securityToken?.substring(0, 20)}...');
+      print('    Expiration: ${response.body!.credentials!.expiration}');
     }
 
-    if (response.assumedRoleUser != null) {
+    if (response.body?.assumedRoleUser != null) {
       print('  Assumed Role User:');
-      print('    ARN: ${response.assumedRoleUser!.arn}');
-      print('    AssumedRoleId: ${response.assumedRoleUser!.assumedRoleId}');
+      print('    ARN: ${response.body!.assumedRoleUser!.arn}');
+      print('    AssumedRoleId: ${response.body!.assumedRoleUser!.assumedRoleId}');
     }
 
-    if (response.sourceIdentity != null) {
-      print('  Source Identity: ${response.sourceIdentity}');
+    if (response.body?.sourceIdentity != null) {
+      print('  Source Identity: ${response.body!.sourceIdentity}');
     }
   } catch (e) {
     print('✗ Error: $e');
@@ -123,14 +141,15 @@ Future<void> assumeRoleWithPolicyExample(
     final response = await client.assumeRole(request);
 
     print('✓ Success!');
-    print('  Request ID: ${response.requestId}');
+    print('  Status Code: ${response.statusCode}');
+    print('  Request ID: ${response.body?.requestId}');
     print(
         '  Applied custom policy to limit permissions to OSS bucket access only');
 
-    if (response.credentials != null) {
+    if (response.body?.credentials != null) {
       print('  Limited Credentials:');
-      print('    AccessKeyId: ${response.credentials!.accessKeyId}');
-      print('    Expiration: ${response.credentials!.expiration}');
+      print('    AccessKeyId: ${response.body!.credentials!.accessKeyId}');
+      print('    Expiration: ${response.body!.credentials!.expiration}');
     }
   } catch (e) {
     print('✗ Error: $e');
@@ -162,19 +181,20 @@ Future<void> assumeRoleWithOIDCExample() async {
     final response = await client.assumeRoleWithOIDC(request);
     
     print('✓ Success!');
-    print('  Request ID: ${response.requestId}');
+    print('  Status Code: ${response.statusCode}');
+    print('  Request ID: ${response.body?.requestId}');
     
-    if (response.credentials != null) {
+    if (response.body?.credentials != null) {
       print('  OIDC Credentials:');
-      print('    AccessKeyId: ${response.credentials!.accessKeyId}');
-      print('    Expiration: ${response.credentials!.expiration}');
+      print('    AccessKeyId: ${response.body!.credentials!.accessKeyId}');
+      print('    Expiration: ${response.body!.credentials!.expiration}');
     }
     
-    if (response.oidcTokenInfo != null) {
+    if (response.body?.oidcTokenInfo != null) {
       print('  OIDC Token Info:');
-      print('    Issuer: ${response.oidcTokenInfo!.issuer}');
-      print('    Subject: ${response.oidcTokenInfo!.subject}');
-      print('    Client IDs: ${response.oidcTokenInfo!.clientIds}');
+      print('    Issuer: ${response.body!.oidcTokenInfo!.issuer}');
+      print('    Subject: ${response.body!.oidcTokenInfo!.subject}');
+      print('    Client IDs: ${response.body!.oidcTokenInfo!.clientIds}');
     }
   } catch (e) {
     print('✗ Error: $e');
@@ -206,19 +226,20 @@ Future<void> assumeRoleWithSAMLExample() async {
     final response = await client.assumeRoleWithSAML(request);
     
     print('✓ Success!');
-    print('  Request ID: ${response.requestId}');
+    print('  Status Code: ${response.statusCode}');
+    print('  Request ID: ${response.body?.requestId}');
     
-    if (response.credentials != null) {
+    if (response.body?.credentials != null) {
       print('  SAML Credentials:');
-      print('    AccessKeyId: ${response.credentials!.accessKeyId}');
-      print('    Expiration: ${response.credentials!.expiration}');
+      print('    AccessKeyId: ${response.body!.credentials!.accessKeyId}');
+      print('    Expiration: ${response.body!.credentials!.expiration}');
     }
     
-    if (response.samlAssertionInfo != null) {
+    if (response.body?.samlAssertionInfo != null) {
       print('  SAML Assertion Info:');
-      print('    Issuer: ${response.samlAssertionInfo!.issuer}');
-      print('    Subject: ${response.samlAssertionInfo!.subject}');
-      print('    Recipient: ${response.samlAssertionInfo!.recipient}');
+      print('    Issuer: ${response.body!.samlAssertionInfo!.issuer}');
+      print('    Subject: ${response.body!.samlAssertionInfo!.subject}');
+      print('    Recipient: ${response.body!.samlAssertionInfo!.recipient}');
     }
   } catch (e) {
     print('✗ Error: $e');

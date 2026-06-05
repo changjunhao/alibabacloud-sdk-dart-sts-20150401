@@ -3,18 +3,24 @@
 [![pub package](https://img.shields.io/pub/v/alibabacloud_sts20150401.svg)](https://pub.dev/packages/alibabacloud_sts20150401)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-Alibaba Cloud Security Token Service (STS) SDK for Dart. This SDK allows you to request temporary, limited-privilege credentials for users or applications.
+Alibaba Cloud Security Token Service (STS) SDK for Dart — request temporary, limited-privilege credentials for accessing cloud resources.
 
 ## Features
 
-- **AssumeRole**: Obtain temporary credentials by assuming a RAM role
-- **AssumeRoleWithOIDC**: Assume a role using OpenID Connect (OIDC) identity provider
-- **AssumeRoleWithSAML**: Assume a role using Security Assertion Markup Language (SAML) identity provider
-- **GetCallerIdentity**: Get information about the current caller identity
+- **AssumeRole** — Obtain temporary credentials by assuming a RAM role
+- **AssumeRoleWithOIDC** — Assume a role using an OpenID Connect (OIDC) identity provider
+- **AssumeRoleWithSAML** — Assume a role using a SAML identity provider
+- **GetCallerIdentity** — Retrieve the identity of the current caller
+- **Automatic retry** with configurable backoff policies
+- **Configurable timeouts** and runtime options
+
+## Requirements
+
+- Dart SDK: `>=2.17.0 <4.0.0`
 
 ## Installation
 
-Add this package to your `pubspec.yaml`:
+Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
@@ -29,33 +35,6 @@ dart pub get
 
 ## Quick Start
 
-### Basic Usage
-
-```dart
-import 'package:alibabacloud_sts20150401/alibabacloud_sts20150401.dart';
-
-void main() async {
-  // Create STS client
-  final client = StsClient(
-    accessKeyId: 'your-access-key-id',
-    accessKeySecret: 'your-access-key-secret',
-    regionId: 'cn-hangzhou', // Optional, defaults to 'cn-hangzhou'
-  );
-
-  try {
-    // Get caller identity
-    final identity = await client.getCallerIdentity();
-    print('Account ID: ${identity.accountId}');
-    print('User ID: ${identity.userId}');
-    print('ARN: ${identity.arn}');
-  } catch (e) {
-    print('Error: $e');
-  }
-}
-```
-
-### Assume Role
-
 ```dart
 import 'package:alibabacloud_sts20150401/alibabacloud_sts20150401.dart';
 
@@ -65,151 +44,124 @@ void main() async {
     accessKeySecret: 'your-access-key-secret',
   );
 
-  final request = AssumeRoleRequest(
-    roleArn: 'acs:ram::123456789012****:role/adminrole',
-    roleSessionName: 'session-name',
-    durationSeconds: 3600, // 1 hour
-    policy: '''{
-      "Version": "1",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": "oss:GetObject",
-          "Resource": "acs:oss:*:*:mybucket/*"
-        }
-      ]
-    }''', // Optional: limit permissions
-  );
-
-  try {
-    final response = await client.assumeRole(request);
-    
-    print('Temporary credentials:');
-    print('AccessKeyId: ${response.credentials?.accessKeyId}');
-    print('AccessKeySecret: ${response.credentials?.accessKeySecret}');
-    print('SecurityToken: ${response.credentials?.securityToken}');
-    print('Expiration: ${response.credentials?.expiration}');
-    
-    print('Assumed role user:');
-    print('ARN: ${response.assumedRoleUser?.arn}');
-    print('AssumedRoleId: ${response.assumedRoleUser?.assumedRoleId}');
-  } catch (e) {
-    print('Error: $e');
-  }
+  final response = await client.getCallerIdentity();
+  print('Account ID: ${response.body?.accountId}');
+  print('ARN: ${response.body?.arn}');
+  print('Identity Type: ${response.body?.identityType}');
 }
 ```
 
-### Assume Role with OIDC
+## Usage
+
+### AssumeRole
 
 ```dart
-import 'package:alibabacloud_sts20150401/alibabacloud_sts20150401.dart';
-
-void main() async {
-  // Note: For OIDC, you don't need AccessKey credentials
-  final client = StsClient(
-    accessKeyId: '', // Empty for OIDC
-    accessKeySecret: '', // Empty for OIDC
-  );
-
-  final request = AssumeRoleWithOIDCRequest(
-    roleArn: 'acs:ram::123456789012****:role/oidcrole',
-    roleSessionName: 'oidc-session',
-    oidcProviderArn: 'acs:ram::123456789012****:oidc-provider/provider-name',
-    oidcToken: 'your-oidc-token',
-    durationSeconds: 3600,
-  );
-
-  try {
-    final response = await client.assumeRoleWithOIDC(request);
-    
-    print('Temporary credentials:');
-    print('AccessKeyId: ${response.credentials?.accessKeyId}');
-    print('AccessKeySecret: ${response.credentials?.accessKeySecret}');
-    print('SecurityToken: ${response.credentials?.securityToken}');
-    
-    print('OIDC token info:');
-    print('Issuer: ${response.oidcTokenInfo?.issuer}');
-    print('Subject: ${response.oidcTokenInfo?.subject}');
-  } catch (e) {
-    print('Error: $e');
-  }
-}
-```
-
-### Assume Role with SAML
-
-```dart
-import 'package:alibabacloud_sts20150401/alibabacloud_sts20150401.dart';
-
-void main() async {
-  // Note: For SAML, you don't need AccessKey credentials
-  final client = StsClient(
-    accessKeyId: '', // Empty for SAML
-    accessKeySecret: '', // Empty for SAML
-  );
-
-  final request = AssumeRoleWithSAMLRequest(
-    roleArn: 'acs:ram::123456789012****:role/samlrole',
-    samlProviderArn: 'acs:ram::123456789012****:saml-provider/provider-name',
-    samlAssertion: 'base64-encoded-saml-assertion',
-    durationSeconds: 3600,
-  );
-
-  try {
-    final response = await client.assumeRoleWithSAML(request);
-    
-    print('Temporary credentials:');
-    print('AccessKeyId: ${response.credentials?.accessKeyId}');
-    print('AccessKeySecret: ${response.credentials?.accessKeySecret}');
-    print('SecurityToken: ${response.credentials?.securityToken}');
-    
-    print('SAML assertion info:');
-    print('Issuer: ${response.samlAssertionInfo?.issuer}');
-    print('Subject: ${response.samlAssertionInfo?.subject}');
-  } catch (e) {
-    print('Error: $e');
-  }
-}
-```
-
-## Configuration
-
-### Client Configuration
-
-```dart
-final client = StsClient(
-  accessKeyId: 'your-access-key-id',
-  accessKeySecret: 'your-access-key-secret',
-  securityToken: 'your-security-token', // Optional: for temporary credentials
-  regionId: 'cn-hangzhou', // Optional: defaults to 'cn-hangzhou'
-  endpoint: 'sts.cn-hangzhou.aliyuncs.com', // Optional: custom endpoint
+final request = AssumeRoleRequest(
+  roleArn: 'acs:ram::123456789012****:role/adminrole',
+  roleSessionName: 'my-session',
+  durationSeconds: 3600,
+  policy: '{"Version":"1","Statement":[{"Effect":"Allow","Action":"oss:GetObject","Resource":"acs:oss:*:*:mybucket/*"}]}',
+  externalId: 'external-id',       // optional
+  sourceIdentity: 'source-id',     // optional
 );
+
+final response = await client.assumeRole(request);
+print('AccessKeyId: ${response.body?.credentials?.accessKeyId}');
+print('AccessKeySecret: ${response.body?.credentials?.accessKeySecret}');
+print('SecurityToken: ${response.body?.credentials?.securityToken}');
+print('Expiration: ${response.body?.credentials?.expiration}');
+print('Assumed Role ARN: ${response.body?.assumedRoleUser?.arn}');
 ```
 
-### Supported Regions
+### AssumeRole with OIDC
 
-The SDK supports all Alibaba Cloud regions. Some commonly used regions:
+```dart
+// OIDC does not require AccessKey credentials
+final client = StsClient(
+  accessKeyId: '',
+  accessKeySecret: '',
+);
 
-- `cn-hangzhou` (China East 1)
-- `cn-shanghai` (China East 2)
-- `cn-beijing` (China North 2)
-- `cn-shenzhen` (China South 1)
-- `ap-southeast-1` (Singapore)
-- `us-west-1` (US West 1)
-- `eu-central-1` (Germany Frankfurt)
+final request = AssumeRoleWithOIDCRequest(
+  roleArn: 'acs:ram::123456789012****:role/oidcrole',
+  roleSessionName: 'oidc-session',
+  oidcProviderArn: 'acs:ram::123456789012****:oidc-provider/my-provider',
+  oidcToken: 'your-oidc-token',
+  durationSeconds: 3600,
+);
+
+final response = await client.assumeRoleWithOIDC(request);
+print('AccessKeyId: ${response.body?.credentials?.accessKeyId}');
+print('Issuer: ${response.body?.oidcTokenInfo?.issuer}');
+print('Subject: ${response.body?.oidcTokenInfo?.subject}');
+```
+
+### AssumeRole with SAML
+
+```dart
+// SAML does not require AccessKey credentials
+final client = StsClient(
+  accessKeyId: '',
+  accessKeySecret: '',
+);
+
+final request = AssumeRoleWithSAMLRequest(
+  roleArn: 'acs:ram::123456789012****:role/samlrole',
+  samlProviderArn: 'acs:ram::123456789012****:saml-provider/my-provider',
+  samlAssertion: 'base64-encoded-saml-assertion',
+  durationSeconds: 3600,
+);
+
+final response = await client.assumeRoleWithSAML(request);
+print('AccessKeyId: ${response.body?.credentials?.accessKeyId}');
+print('Issuer: ${response.body?.samlAssertionInfo?.issuer}');
+print('Subject: ${response.body?.samlAssertionInfo?.subject}');
+```
+
+### GetCallerIdentity
+
+```dart
+final response = await client.getCallerIdentity();
+print('Account ID: ${response.body?.accountId}');
+print('User ID: ${response.body?.userId}');
+print('ARN: ${response.body?.arn}');
+print('Identity Type: ${response.body?.identityType}');
+print('Principal ID: ${response.body?.principalId}');
+```
+
+### RuntimeOptions (Timeout & Retry)
+
+Every API method has a `*WithOptions` variant that accepts `RuntimeOptions`:
+
+```dart
+final runtime = RuntimeOptions(
+  autoretry: true,
+  maxAttempts: 3,
+  backoffPolicy: 'exponential', // 'no', 'equal', or 'exponential'
+  backoffPeriod: 1000,          // milliseconds
+  connectTimeout: 5000,         // milliseconds
+  readTimeout: 10000,           // milliseconds
+);
+
+final response = await client.assumeRoleWithOptions(request, runtime);
+// Also available:
+// client.assumeRoleWithOIDCWithOptions(request, runtime)
+// client.assumeRoleWithSAMLWithOptions(request, runtime)
+// client.getCallerIdentityWithOptions(runtime)
+```
 
 ## Error Handling
 
-The SDK throws `StsException` for API errors:
+The SDK throws `StsException` on API errors:
 
 ```dart
 try {
   final response = await client.assumeRole(request);
-  // Handle success
 } on StsException catch (e) {
-  print('STS Error: ${e.message}');
-} catch (e) {
-  print('Other Error: $e');
+  print('Code: ${e.code}');
+  print('Message: ${e.message}');
+  print('Request ID: ${e.requestId}');
+  print('HTTP Status: ${e.statusCode}');
 }
 ```
 
@@ -217,53 +169,93 @@ try {
 
 ### StsClient
 
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `accessKeyId` | `String` | Yes | — | Alibaba Cloud AccessKey ID |
+| `accessKeySecret` | `String` | Yes | — | Alibaba Cloud AccessKey Secret |
+| `securityToken` | `String?` | No | `null` | STS token for temporary credentials |
+| `regionId` | `String` | No | `'cn-hangzhou'` | Region ID |
+| `endpoint` | `String?` | No | `null` | Custom endpoint (overrides default resolution) |
+
 #### Methods
 
-- `Future<AssumeRoleResponse> assumeRole(AssumeRoleRequest request)`
-- `Future<AssumeRoleWithOIDCResponse> assumeRoleWithOIDC(AssumeRoleWithOIDCRequest request)`
-- `Future<AssumeRoleWithSAMLResponse> assumeRoleWithSAML(AssumeRoleWithSAMLRequest request)`
-- `Future<GetCallerIdentityResponse> getCallerIdentity()`
+| Method | Returns |
+|--------|---------|
+| `assumeRole(AssumeRoleRequest)` | `Future<AssumeRoleResponse>` |
+| `assumeRoleWithOptions(AssumeRoleRequest, RuntimeOptions)` | `Future<AssumeRoleResponse>` |
+| `assumeRoleWithOIDC(AssumeRoleWithOIDCRequest)` | `Future<AssumeRoleWithOIDCResponse>` |
+| `assumeRoleWithOIDCWithOptions(AssumeRoleWithOIDCRequest, RuntimeOptions)` | `Future<AssumeRoleWithOIDCResponse>` |
+| `assumeRoleWithSAML(AssumeRoleWithSAMLRequest)` | `Future<AssumeRoleWithSAMLResponse>` |
+| `assumeRoleWithSAMLWithOptions(AssumeRoleWithSAMLRequest, RuntimeOptions)` | `Future<AssumeRoleWithSAMLResponse>` |
+| `getCallerIdentity()` | `Future<GetCallerIdentityResponse>` |
+| `getCallerIdentityWithOptions(RuntimeOptions)` | `Future<GetCallerIdentityResponse>` |
 
-### Request Models
+### Models
 
-- `AssumeRoleRequest`
-- `AssumeRoleWithOIDCRequest`
-- `AssumeRoleWithSAMLRequest`
+#### AssumeRoleRequest
 
-### Response Models
+| Field | Type | Description |
+|-------|------|-------------|
+| `roleArn` | `String?` | ARN of the RAM role |
+| `roleSessionName` | `String?` | Custom name of the role session |
+| `durationSeconds` | `int?` | Token validity period in seconds |
+| `policy` | `String?` | Permission policy (JSON) to limit the token |
+| `externalId` | `String?` | External ID of the RAM role |
+| `sourceIdentity` | `String?` | Source identity |
 
-- `AssumeRoleResponse`
-- `AssumeRoleWithOIDCResponse`
-- `AssumeRoleWithSAMLResponse`
-- `GetCallerIdentityResponse`
+#### AssumeRoleWithOIDCRequest
 
-### Common Models
+| Field | Type | Description |
+|-------|------|-------------|
+| `roleArn` | `String?` | ARN of the RAM role |
+| `roleSessionName` | `String?` | Custom name of the role session |
+| `oidcProviderArn` | `String?` | ARN of the OIDC identity provider |
+| `oidcToken` | `String?` | OIDC token |
+| `durationSeconds` | `int?` | Token validity period in seconds |
+| `policy` | `String?` | Permission policy (JSON) to limit the token |
 
-- `Credentials`
-- `AssumedRoleUser`
-- `OIDCTokenInfo`
-- `SAMLAssertionInfo`
+#### AssumeRoleWithSAMLRequest
 
-## Requirements
+| Field | Type | Description |
+|-------|------|-------------|
+| `roleArn` | `String?` | ARN of the RAM role |
+| `samlProviderArn` | `String?` | ARN of the SAML identity provider |
+| `samlAssertion` | `String?` | Base64-encoded SAML assertion |
+| `durationSeconds` | `int?` | Token validity period in seconds |
+| `policy` | `String?` | Permission policy (JSON) to limit the token |
 
-- Dart SDK: >=2.17.0 <4.0.0
+#### Credentials
 
-## Dependencies
+| Field | Type | Description |
+|-------|------|-------------|
+| `accessKeyId` | `String?` | Temporary AccessKey ID |
+| `accessKeySecret` | `String?` | Temporary AccessKey Secret |
+| `securityToken` | `String?` | Security token |
+| `expiration` | `String?` | Token expiration time (UTC) |
 
-- `http`: For making HTTP requests
-- `crypto`: For signature generation
-- `convert`: For encoding/decoding
+#### GetCallerIdentityResponseBody
 
-## Contributing
+| Field | Type | Description |
+|-------|------|-------------|
+| `accountId` | `String?` | Alibaba Cloud account ID |
+| `arn` | `String?` | ARN of the caller |
+| `identityType` | `String?` | Caller identity type |
+| `principalId` | `String?` | Principal ID |
+| `userId` | `String?` | RAM user ID |
+| `roleId` | `String?` | RAM role ID |
+| `requestId` | `String?` | Request ID |
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+#### RuntimeOptions
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `autoretry` | `bool?` | `null` | Enable automatic retry |
+| `maxAttempts` | `int?` | `3` | Maximum retry attempts |
+| `backoffPolicy` | `String?` | `null` | `'no'`, `'equal'`, or `'exponential'` |
+| `backoffPeriod` | `int?` | `null` | Backoff period in milliseconds |
+| `connectTimeout` | `int?` | `5000` | Connection timeout in milliseconds |
+| `readTimeout` | `int?` | `10000` | Read timeout in milliseconds |
 
 ## License
 
-This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
-
-## Links
-
-- [Alibaba Cloud STS Documentation](https://www.alibabacloud.com/help/en/ram/developer-reference/api-sts-2015-04-01-assumerole)
-- [Alibaba Cloud Console](https://ecs.console.aliyun.com/)
-- [Dart Package](https://pub.dev/packages/alibabacloud_sts20150401)
+[Apache 2.0](LICENSE)
