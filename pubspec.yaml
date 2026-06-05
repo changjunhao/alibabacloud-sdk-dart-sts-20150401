@@ -2,6 +2,13 @@ name: alibabacloud_sts20150401
 description: A Dart SDK for Alibaba Cloud Security Token Service (STS) API, enabling secure temporary credential management for cloud resource access.
 version: 1.1.0
 homepage: https://github.com/changjunhao/alibabacloud-sdk-dart-sts-20150401
+repository: https://github.com/changjunhao/alibabacloud-sdk-dart-sts-20150401
+issue_tracker: https://github.com/changjunhao/alibabacloud-sdk-dart-sts-20150401/issues
+topics:
+  - alibaba-cloud
+  - sts
+  - security-token
+  - cloud-sdk
 
 environment:
   sdk: '>=2.17.0 <4.0.0'

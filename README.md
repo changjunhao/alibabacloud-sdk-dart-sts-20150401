@@ -24,7 +24,7 @@ Add the dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  alibabacloud_sts20150401: ^1.0.0
+  alibabacloud_sts20150401: ^1.1.0
 ```
 
 Then run:
